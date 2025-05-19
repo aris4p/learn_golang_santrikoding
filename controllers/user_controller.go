@@ -38,6 +38,7 @@ func CreateUser(c *gin.Context) {
 			Message: "Validation Errors",
 			Errors:  helpers.TranslateErrorMessage(err),
 		})
+		return
 	}
 
 	// inisialisasi user baru

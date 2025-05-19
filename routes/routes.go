@@ -19,25 +19,32 @@ func SetupRouter() *gin.Engine {
 		ExposeHeaders: []string{"Content-Length"},
 	}))
 
-	// route register
+	// Auth routes
 	router.POST("/api/register", controllers.Register)
-	// route login
 	router.POST("/api/login", controllers.Login)
 
-	// route users
-	router.GET("/api/users", middlewares.AuthMiddleware(), controllers.FindUser)
+	// Serve folder uploads
+	router.Static("/uploads", "./uploads")
 
-	// route user create
-	router.POST("/api/users", middlewares.AuthMiddleware(), controllers.CreateUser)
+	// User routes (with authentication)
+	userRoutes := router.Group("/api/users", middlewares.AuthMiddleware())
+	{
+		userRoutes.GET("", controllers.FindUser)
+		userRoutes.POST("", controllers.CreateUser)
+		userRoutes.GET("/:id", controllers.FindUserById)
+		userRoutes.PUT("/:id", controllers.UpdateUser)
+		userRoutes.DELETE("/:id", controllers.DeleteUser)
+	}
 
-	// route user by id
-	router.GET("/api/users/:id", middlewares.AuthMiddleware(), controllers.FindUserById)
-
-	// route user update
-	router.PUT("/api/users/:id", middlewares.AuthMiddleware(), controllers.UpdateUser)
-
-	// route user delete
-	router.DELETE("/api/users/:id", middlewares.AuthMiddleware(), controllers.DeleteUser)
+	// Product routes (with authentication)
+	productRoutes := router.Group("/api/products", middlewares.AuthMiddleware())
+	{
+		productRoutes.GET("", controllers.FindProduct)
+		productRoutes.POST("", controllers.CreateProduct)
+		productRoutes.GET("/:id", controllers.FindProductById)
+		productRoutes.PUT("/:id", controllers.UpdateProduct)
+		productRoutes.DELETE("/:id", controllers.DeleteProduct)
+	}
 
 	return router
 }
